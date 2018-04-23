@@ -1,0 +1,24 @@
+{% from "macros.html" import link_to %}
+{% extends "bootstrap/base.html" %}
+
+
+
+  <head>
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>FWAT - Fast WSI Annotation Tool</title>
+    {% endif %}
+  </head>
+  {% block body %}
+
+  <div class="container-fluid">
+    
+      <!-- Navigation bar here -->
+
+      {% block content %}
+      <!-- Main page content here -->
+      {% endblock %}
+
+  </div>
+  {% endblock %}
