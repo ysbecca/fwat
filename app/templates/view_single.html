@@ -9,103 +9,111 @@ Image ID: {{ image_id }} </br>
 Image directory: {{ image_dir }} </br>
 Image name: {{ file_name }} </br>
 
-<div id="images">
-    <div class="current-slide">
-        <a class="load-slide" href="#" data-url="{{ slide_url }}"
-                data-mpp="{{ slide_mpp }}">Slide</a>
-    </div>
-    <h2>Associated images</h2>
-    {% if associated %}
-        <ul class="associated-images">
-            {% for name in associated|sort %}
-                <li><a class="load-slide" href="#"
-                        data-url="{{ associated[name] }}">
-                    {{ name }}
-                </a>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <span class="associated-images notice">None</span>
-    {% endif %}
+<div class="row">
+	<div class="col-10">
+		<!-- Slide viewer window here -->
+		<div id="view_slide"></div>
+	</div>
+	<div class="col-2">
+		<!-- Related images - thumbnail, etc. -->
+		<h5>Associated images</h5>
+		{% if associated %}
+		    <ul class="associated-images">
+		        {% for name in associated|sort %}
+		            <li><a class="load-slide" href="#"
+		                    data-url="{{ associated[name] }}">
+		                {{ name }}
+		            </a>
+		        {% endfor %}
+		    </ul>
+		{% else %}
+		    <span class="associated-images notice">None</span>
+		{% endif %}
+
+		<h5>Slide properties</h5>
+		{% if properties %}
+		    <div id="properties-inner">
+		        <dl>
+		        {% for name in properties %}
+		            <dt>{{ name }}
+		            <dd>{{ properties[name] }}
+		        {% endfor %}
+		        </dl>
+		    </div>
+		{% else %}
+		    <span class="notice">None</span>
+		{% endif %}
+
+		<h5>Annotation controls</h5>
+		Save annotations; reset annotations; case study navigation buttons.
+
+	</div>
 </div>
-<div id="view"></div>
-<div id="properties">
-    <h1>Slide properties</h1>
-    {% if properties %}
-        <div id="properties-inner">
-            <dl>
-            {% for name in properties %}
-                <dt>{{ name }}
-                <dd>{{ properties[name] }}
-            {% endfor %}
-            </dl>
-        </div>
-    {% else %}
-        <span class="notice">None</span>
-    {% endif %}
-</div>
+
+
 
 <script type="text/javascript" src="static/jquery.js"></script>
-<script type="text/javascript" src="static/openseadragon.js"></script>
-<script type="text/javascript" src="static/openseadragon-scalebar.js"></script>
+<script type="text/javascript" src="static/openseadragon/openseadragon.js"></script>
+<script type="text/javascript" src="static/openseadragon/openseadragon-scalebar.js"></script>
 <script type="text/javascript">
 
-$(document).ready(function() {
-    var dzi_data = {{ dzi_data|default('{}')|safe }};
-    var viewer = new OpenSeadragon({
-        id: "view",
-        prefixUrl: "../static/openseadragon/images/",
-        timeout: 120000,
-        animationTime: 0.5,
-        blendTime: 0.1,
-        constrainDuringPan: true,
-        maxZoomPixelRatio: 2,
-        minZoomLevel: 1,
-        visibilityRatio: 1,
-        zoomPerScroll: 2,
-    });
-    viewer.addHandler("open", function() {
-        // To improve load times, ignore the lowest-resolution Deep Zoom
-        // levels.  This is a hack: we can't configure the minLevel via
-        // OpenSeadragon configuration options when the viewer is created
-        // from DZI XML.
-        viewer.source.minLevel = 8;
-    });
-    viewer.scalebar({
-        xOffset: 10,
-        yOffset: 10,
-        barThickness: 3,
-        color: '#555555',
-        fontColor: '#333333',
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    });
+	$(document).ready(function() {
+	    var dzi_data = {{ dzi_data|default('{}')|safe }};
+	    var viewer = new OpenSeadragon({
+	        id: "view_slide",
+	        prefixUrl: "static/openseadragon/images/",
+	        timeout: 120000,
+	        animationTime: 0.75,
+	        blendTime: 0.1,
+	        constrainDuringPan: true,
+	        maxZoomPixelRatio: 2,
+	        minZoomLevel: 1,
+	        visibilityRatio: 1,
+	        zoomPerScroll: 2,
+	    });
+	    viewer.addHandler("open", function() {
+	        // To improve load times, ignore the lowest-resolution Deep Zoom
+	        // levels.  This is a hack: we can't configure the minLevel via
+	        // OpenSeadragon configuration options when the viewer is created
+	        // from DZI XML.
+	        viewer.source.minLevel = 8;
+	    });
+	    viewer.scalebar({
+	        xOffset: 10,
+	        yOffset: 10,
+	        barThickness: 3,
+	        color: '#555555',
+	        fontColor: '#333333',
+	        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+	    });
 
-    function open_slide(url, mpp) {
-        var tile_source;
-        if (dzi_data[url]) {
-            // DZI XML provided as template argument (deepzoom_tile.py)
-            tile_source = new OpenSeadragon.DziTileSource(
-                    OpenSeadragon.DziTileSource.prototype.configure(
-                    OpenSeadragon.parseXml(dzi_data[url]), url));
-        } else {
-            // DZI XML fetched from server (deepzoom_server.py)
-            tile_source = url;
-        }
-        viewer.open(tile_source);
-        viewer.scalebar({
-            pixelsPerMeter: mpp ? (1e6 / mpp) : 0,
-        });
-    }
+	    function open_slide(url, mpp) {
+	        var tile_source;
+	        if (dzi_data[url]) {
+	            // DZI XML provided as template argument (deepzoom_tile.py)
+	            tile_source = new OpenSeadragon.DziTileSource(
+	                    OpenSeadragon.DziTileSource.prototype.configure(
+	                    OpenSeadragon.parseXml(dzi_data[url]), url));
+	        } else {
+	            // DZI XML fetched from server (deepzoom_server.py)
+	            tile_source = url;
+	        }
+	        viewer.open(tile_source);
+	        viewer.scalebar({
+	            pixelsPerMeter: mpp ? (1e6 / mpp) : 0,
+	        });
+	    }
 
-    open_slide("{{ slide_url }}", parseFloat('{{ slide_mpp }}'));
-    $(".load-slide").click(function(ev) {
-        $(".current-slide").removeClass("current-slide");
-        $(this).parent().addClass("current-slide");
-        open_slide($(this).attr('data-url'),
-                parseFloat($(this).attr('data-mpp')));
-        ev.preventDefault();
-    });
-});
+	    open_slide("{{ slide_url }}", parseFloat('{{ slide_mpp }}'));
+	    $(".load-slide").click(function(ev) {
+	        $(".current-slide").removeClass("current-slide");
+	        $(this).parent().addClass("current-slide");
+	        open_slide($(this).attr('data-url'),
+	                parseFloat($(this).attr('data-mpp')));
+	        ev.preventDefault();
+	    });
+	});
+
 </script>
 
 
