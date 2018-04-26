@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, make_response, url_for
+from flask import render_template, make_response, url_for, abort
 import openslide
 from openslide import ImageSlide, open_slide
 from openslide.deepzoom import DeepZoomGenerator
@@ -12,13 +12,11 @@ from io import BytesIO
 
 @app.route('/')
 def index():
-
     user = {'name': 'R Stone'}
     return render_template('index.html',
                            user=user)
 
 # @app.route('/view/<int:study_id>/<int:image_id>')
-
 
 # Temporary single page for viewing a single WSI - testing only.
 @app.route('/view_single')

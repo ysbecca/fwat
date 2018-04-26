@@ -1,63 +1,47 @@
-{% extends "base.html" %}
+<!-- {% extends "base.html" %} -->
+
 {% block content %}
 
-
-<h2>Viewing a single image</h2>
-
-<h4>Test image</h4>
-Image ID: {{ image_id }} </br>
-Image directory: {{ image_dir }} </br>
-Image name: {{ file_name }} </br>
-
 <div class="row">
-	<div class="col-10">
-		<!-- Slide viewer window here -->
+	<div class="col col-md-10">
 		<div id="view_slide"></div>
 	</div>
-	<div class="col-2">
-		<!-- Related images - thumbnail, etc. -->
-		<h5>Associated images</h5>
-		{% if associated %}
-		    <ul class="associated-images">
-		        {% for name in associated|sort %}
-		            <li><a class="load-slide" href="#"
-		                    data-url="{{ associated[name] }}">
-		                {{ name }}
-		            </a>
-		        {% endfor %}
-		    </ul>
-		{% else %}
-		    <span class="associated-images notice">None</span>
-		{% endif %}
-
-		<h5>Slide properties</h5>
-		{% if properties %}
-		    <div id="properties-inner">
-		        <dl>
-		        {% for name in properties %}
-		            <dt>{{ name }}
-		            <dd>{{ properties[name] }}
-		        {% endfor %}
-		        </dl>
-		    </div>
-		{% else %}
-		    <span class="notice">None</span>
-		{% endif %}
-
-		<h5>Annotation controls</h5>
-		Save annotations; reset annotations; case study navigation buttons.
-
+	<div class="col col-md-2">
+	    <div class="row">
+    	
+		    <h5>Slide details</h5>
+		    
+			Image ID: {{ image_id }} </br>
+			<!-- Image directory: {{ image_dir }} </br> -->
+			Image name: {{ file_name }} </br>
+		
+		
+			<h5>Annotation controls</h5>
+			<br/></br>
+			<button type="button" id="reset_button" class="btn btn-warning">Reset annotations</button></br>
+			<br/>
+			<button type="button" id="save_button" class="btn btn-success">Save annotations&nbsp;</button></br>
+			<br/></br>
+			<p>
+				<div class="btn-group" role="group" aria-label="...">
+					<button type="button" id="prev_button" class="btn btn-default">Previous</button>
+					<button type="button" id="next_button" class="btn btn-default">Next&nbsp;&nbsp;</button>
+				</div>
+			</p>
+			
+		</div>
 	</div>
 </div>
-
 
 
 <script type="text/javascript" src="static/jquery.js"></script>
 <script type="text/javascript" src="static/openseadragon/openseadragon.js"></script>
 <script type="text/javascript" src="static/openseadragon/openseadragon-scalebar.js"></script>
+<script type="text/javascript" src="static/openseadragon-annotations/dist/openseadragon-annotations.js"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
+
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
 	    var viewer = new OpenSeadragon({
 	        id: "view_slide",
@@ -70,6 +54,7 @@ Image name: {{ file_name }} </br>
 	        minZoomLevel: 1,
 	        visibilityRatio: 1,
 	        zoomPerScroll: 2,
+
 	    });
 	    viewer.addHandler("open", function() {
 	        // To improve load times, ignore the lowest-resolution Deep Zoom
@@ -102,6 +87,8 @@ Image name: {{ file_name }} </br>
 	        viewer.scalebar({
 	            pixelsPerMeter: mpp ? (1e6 / mpp) : 0,
 	        });
+	        
+	        viewer.initializeAnnotations();
 	    }
 
 	    open_slide("{{ slide_url }}", parseFloat('{{ slide_mpp }}'));
@@ -112,6 +99,39 @@ Image name: {{ file_name }} </br>
 	                parseFloat($(this).attr('data-mpp')));
 	        ev.preventDefault();
 	    });
+
+     	// Handlers for button actions
+		$( "#reset_button" ).click(function() {
+  			console.log( "Handler for .reset_button called." );
+  			viewer.annotations.clean();
+		});
+
+		$( "#save_button" ).click(function() {
+  			console.log( "Handler for .save_button called." );
+  			var annotations = viewer.annotations.get();
+  			console.log(annotations);
+
+  			for (var i = 0; i < annotations.length; i++) {
+  				if (i % 2 == 1) {
+  					// Odd
+  					var path_data = annotations[i][1]['d'];
+  					console.log(i);
+  					console.log(path_data); // The SVG coordinates to send back to server.
+  				}
+  			}
+
+  			// Get the SVG viewbox coordinates.
+  			var view_height = $("div#view_slide").height();
+  			var view_width = $("div#view_slide").width();
+  			console.log(view_height + ", " + view_width);
+		});
+
+		$( "#prev_button" ).click(function() {
+  			console.log( "Handler for .prev_button called." );
+		});
+		$( "#next_button" ).click(function() {
+  			console.log( "Handler for .next_button called." );
+		});
 	});
 
 </script>

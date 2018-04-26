@@ -1,16 +1,11 @@
-/*html {
+html {
     overflow: hidden;
 }
-body {
-    margin: 0;
-    padding: 0;
-}
-div#view {
-    position: absolute;
-    left: 0;
+
+div#view_slide {
     width: 100%;
     height: 100%;
     background-color: black;
+    border: 1px solid #000;
     color: white;
 }
-</style>*/

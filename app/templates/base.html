@@ -1,23 +1,31 @@
 {% from "macros.html" import link_to %}
 {% extends "bootstrap/base.html" %}
 
-
-
   <head>
+    <!-- Styles -->
+    {% block styles %}
+    {{ super() }}
+    <link rel="stylesheet"
+          href="{{url_for('.static', filename='style.css')}}">
+    {% endblock %}
+
+    <!-- Title -->
     {% if title %}
     <title>{{ title }}</title>
     {% else %}
     <title>FWAT - Fast WSI Annotation Tool</title>
     {% endif %}
+
   </head>
   {% block body %}
 
   <div class="container-fluid">
     
-      <!-- Navigation bar here -->
+      <!-- Navigation bar here. -->
 
       {% block content %}
-      <!-- Main page content here -->
+      <!-- Main page content here, except for slide viewing page (within a study). -->
+
       {% endblock %}
 
   </div>
