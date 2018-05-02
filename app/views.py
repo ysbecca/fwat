@@ -1,13 +1,14 @@
-from app import app
+from app import app, models
 
-from flask import render_template, make_response, url_for, abort
+from flask import render_template, make_response, url_for, abort, request
 import openslide
 from openslide import ImageSlide, open_slide
 from openslide.deepzoom import DeepZoomGenerator
 import re
 from unicodedata import normalize
 from io import BytesIO
-
+import json
+import ast
 
 
 @app.route('/')
@@ -21,8 +22,8 @@ def index():
 # Temporary single page for viewing a single WSI - testing only.
 @app.route('/view_single')
 def view_single():
-	# Eventually, will load the image object from DB
-	image_id = 0
+	# Eventually, will load the image object from DB instead of hard coded here.
+	image_id = 102
 	image_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/Case_0001/"
 	file_name = "A01.svs"
 
@@ -35,37 +36,66 @@ def view_single():
 	opts = dict((v, app.config[k]) for k, v in config_map.items())
 
 	slide = open_slide(image_dir + file_name)
-	try:
-	    mpp_x = slide.properties[openslide.PROPERTY_NAME_MPP_X]
-	    mpp_y = slide.properties[openslide.PROPERTY_NAME_MPP_Y]
-	    app.slide_mpp = (float(mpp_x) + float(mpp_y)) / 2
-	except (KeyError, ValueError):
-		app.slide_mpp = 0
+	# Fetch the x and y dimensions of the original WSI
+	if not slide: 
+		associated_urls = {}
+		file_name = "ERROR: unable to load image " + file_name + " at " + image_dir
+	else:
+		x, y = slide.dimensions
 
-	# Save globally in app config variables
-	slide_slug = file_name
-	app.slides = {
-		slide_slug: DeepZoomGenerator(slide, **opts)
-	}
-	app.config['DEEPZOOM_SLIDE'] = image_dir + file_name
+		try:
+		    mpp_x = slide.properties[openslide.PROPERTY_NAME_MPP_X]
+		    mpp_y = slide.properties[openslide.PROPERTY_NAME_MPP_Y]
+		    app.slide_mpp = (float(mpp_x) + float(mpp_y)) / 2
+		except (KeyError, ValueError):
+			app.slide_mpp = 0
 
-	app.associated_images = []
-	app.slide_properties = slide.properties
-	for name, image in slide.associated_images.items():
-		app.associated_images.append(name)
-		slug = slugify(name)
-		app.slides[slug] = DeepZoomGenerator(ImageSlide(image), **opts)
+		# Save globally in app config variables
+		slide_slug = file_name
+		app.slides = {
+			slide_slug: DeepZoomGenerator(slide, **opts)
+		}
+		app.config['DEEPZOOM_SLIDE'] = image_dir + file_name
 
-	slide_url = url_for('dzi', slug=slide_slug)
-	associated_urls = dict((file_name, url_for('dzi', slug=slugify(file_name)))
-	        for file_name in app.associated_images)
+		app.associated_images = []
+		app.slide_properties = slide.properties
+		for name, image in slide.associated_images.items():
+			app.associated_images.append(name)
+			slug = slugify(name)
+			app.slides[slug] = DeepZoomGenerator(ImageSlide(image), **opts)
+
+
+		slide_url = url_for('dzi', slug=slide_slug)
+		associated_urls = dict((file_name, url_for('dzi', slug=slugify(file_name)))
+		        for file_name in app.associated_images)
 
 	return render_template('view_single.html', slide_url=slide_url,
             associated=associated_urls, #, properties=app.slide_properties,
             slide_mpp=app.slide_mpp,
             image_id=image_id,
             image_dir=image_dir,
-            file_name=file_name)
+            file_name=file_name,
+            x=x, y=y)
+
+
+@app.route('/save_annotations', methods=['POST'])
+def save_annotations():
+    print("Received: " + str(request))
+    
+    data = request.values.to_dict(flat=False)
+    # This is a hack because of the way the data is stored in a stringified string.
+    key, value = data.popitem()
+    parsed_data = ast.literal_eval(key)
+    paths = parsed_data["paths"]
+    image_id = parsed_data["image_id"]
+    wsi_x, wsi_y = parsed_data["wsi_x"], parsed_data["wsi_y"]
+
+    # Create "save_annotation" function of Image model.
+    # It does parsing and saving.
+    Image.save_new_annotations_file(svg_path_string, wsi_x, wsi_y)
+
+    return json.dumps({'status':'OK','data': str(paths) });
+
 
 @app.route('/<slug>.dzi')
 def dzi(slug):
@@ -98,7 +128,6 @@ def tile(slug, level, col, row, format):
     resp = make_response(buf.getvalue())
     resp.mimetype = 'image/%s' % format
     return resp
-
 
 def slugify(text):
     text = normalize('NFKD', text.lower()).encode('ascii', 'ignore').decode()

@@ -3,15 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 
 
-
 app = Flask(__name__)
-app.config.from_pyfile('config.cfg')
-
+app.config.from_pyfile('config.py')
 
 # Add the Bootstrap markup
 Bootstrap(app)
 
 # Create an instance of the DB
-# db = SQLAlchemy(app)
+db = SQLAlchemy(app)
 
-from app import views #, models
+from app import views, models

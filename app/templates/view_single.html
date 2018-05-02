@@ -11,12 +11,11 @@
     	
 		    <h5>Slide details</h5>
 		    
-			Image ID: {{ image_id }} </br>
+			Image ID: <div id="image_id">{{ image_id }}</div></br>
 			<!-- Image directory: {{ image_dir }} </br> -->
 			Image name: {{ file_name }} </br>
 		
 		
-			<h5>Annotation controls</h5>
 			<br/></br>
 			<button type="button" id="reset_button" class="btn btn-warning">Reset annotations</button></br>
 			<br/>
@@ -42,12 +41,16 @@
 
 	$(document).ready(function() {
 
+		var wsi_x = parseInt("{{ x }}");
+		var wsi_y = parseInt("{{ y }}");
+		var image_id = parseInt($("div#image_id").text())
+
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
 	    var viewer = new OpenSeadragon({
 	        id: "view_slide",
 	        prefixUrl: "static/openseadragon/images/",
 	        timeout: 120000,
-	        animationTime: 0.75,
+	        animationTime: 0.25,
 	        blendTime: 0.1,
 	        constrainDuringPan: true,
 	        maxZoomPixelRatio: 2,
@@ -109,21 +112,31 @@
 		$( "#save_button" ).click(function() {
   			console.log( "Handler for .save_button called." );
   			var annotations = viewer.annotations.get();
-  			console.log(annotations);
+  			var all_paths = []
 
   			for (var i = 0; i < annotations.length; i++) {
   				if (i % 2 == 1) {
   					// Odd
   					var path_data = annotations[i][1]['d'];
-  					console.log(i);
-  					console.log(path_data); // The SVG coordinates to send back to server.
+  					// console.log(path_data); // The SVG coordinates to send back to server.
+  					all_paths.push(path_data);
   				}
   			}
 
-  			// Get the SVG viewbox coordinates.
-  			var view_height = $("div#view_slide").height();
-  			var view_width = $("div#view_slide").width();
-  			console.log(view_height + ", " + view_width);
+  			var all_data = {paths: all_paths, image_id: image_id, wsi_x: wsi_x, wsi_y: wsi_y};
+  			console.log(all_data)
+			$.ajax({
+	            url: '/save_annotations',
+	            dataType: 'json',
+	            data: JSON.stringify(all_data),
+	            type: 'POST',
+	            success: function(response) {
+	                console.log(response);
+	            },
+	            error: function(error) {
+	                console.log(error);
+	            }
+	        });
 		});
 
 		$( "#prev_button" ).click(function() {
