@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% set active_page = "datasets" %}
+
+{% block content %}
+<div class="container-fluid">
+<br/>
+<p class="lead">Create a New Dataset</p>
+
+<br/><p>
+A <strong>Dataset</strong> is a set of images which can be used for a study.
+</p>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Create a new dataset</h3>
+  </div>
+  <div class="panel-body">
+ 
+    {% from "macros.html" import render_field %}
+    <form method=post>
+      <dl>
+        <div class="form-group">{{ render_field(form.name, class="form-control") }}  </div>
+        <div class="form-group">{{ render_field(form.directory, class="form-control") }}  </div>
+
+        <p>Images may be selected individually or by folders. Only the image name is stored, and images must be located in the directory specified above, or in one of its sub-directories.</p>
+        <input id="images" name="images[]" type="file" class="file" multiple>
+        <!-- TODO modify JS so as to NOT upload the file contents. -->
+      </dl>
+      <p>
+      <button type="submit" class="btn btn-default">Create dataset</button>
+    </form>
+
+  </div>
+</div>
+
+</div>
+
+
+<script type="text/javascript" src="static/jquery.js"></script>
+<script src="../static/bootstrap-fileinput/js/plugins/piexif.min.js" type="text/javascript"></script>
+
+<!-- the main fileinput plugin file -->
+<script src="../static/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script src="../static/bootstrap-fileinput/themes/gly/theme.js"></script>
+<script type="text/javascript">
+
+    // with plugin options
+    $("#images").fileinput({ 
+        theme: "gly",
+        showUpload: false,
+        showCancel: false,
+        uploadAsync: true,
+        hideThumbnailContent: true,
+        previewIcon: false,
+    });
+
+    $( ":submit" ).click(function() {
+        console.log( "Submit clicked." );
+    
+        // On click of submit... capture the filenames.
+        var files = $(":file").get(0).files;
+        var file_names = []
+        for (var i = 0; i < files.length; i++) {
+            file_names.push(files[i]);
+        }
+    });
+
+</script>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+

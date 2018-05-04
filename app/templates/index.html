@@ -1,13 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% set active_page = "dashboard" %}
 
 <h1>Welcome to FWAT</h1>
 
 <p class="lead">
-	A Fast Whole-slide image Annotation Tool (FWAT) for conducting painless studies requiring annotations on whole-slide images.
+	A Fast Whole-slide image Annotation Tool for gathering annotations on whole-slide images.
 </p>
 
-{{ link_to('view_single', "View a single WSI") }}
+{{ link_to('view_single', "View a single WSI - test") }}
+
+<br/><br/><br/><br/>
+<!-- Show all existing studies and datasets -->
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">All datasets</h3>
+  </div>
+  <div class="panel-body">
+
+	<ul class="list-group">
+		{% for dataset in datasets %}
+			<li class="list-group-item"><a href="#">{{ dataset.name }}</a></li>
+		{% endfor %}
+	</ul>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">All studies</h3>
+  </div>
+  <div class="panel-body">
+	<ul class="list-group">
+		{% for study in studies %}
+			<li class="list-group-item">{{ link_to('view_study', study.name) }}</li>
+		{% endfor %}
+	</ul>
+
+  </div>
+</div>
+
+
 
 {% endblock %}

@@ -1,6 +1,7 @@
-from app import app, models
+from app import app
+from app.models import *
 
-from flask import render_template, make_response, url_for, abort, request
+from flask import render_template, make_response, url_for, abort, request, flash
 import openslide
 from openslide import ImageSlide, open_slide
 from openslide.deepzoom import DeepZoomGenerator
@@ -10,14 +11,41 @@ from io import BytesIO
 import json
 import ast
 
-
 @app.route('/')
 def index():
-    user = {'name': 'R Stone'}
+    user = {'name': 'Rebecca Stone'}
+
+    # Show all the datasets and studies on the dashboard
+    datasets = Dataset.query.all()
+    studies = Study.query.all()
+
     return render_template('index.html',
+    					   datasets=datasets,
+    					   studies=studies,
                            user=user)
 
+@app.route('/new_dataset', methods=['GET', 'POST'])
+def new_dataset():
+	form = DatasetForm(request.form)
+	if request.method == 'POST' and form.validate():
+		print(form.name.data)
+		print(form.directory.data)
+		print(form.images.data)
+
+		# dataset = Dataset(form.name.data, form.images.data)
+		# db_session.add(dataset)
+
+		flash('New dataset created:' + str(form.name.data))
+		return redirect(url_for('/new_dataset'))
+
+	return render_template('new_dataset.html', form=form)
+
 # @app.route('/view/<int:study_id>/<int:image_id>')
+
+
+@app.route('/view_study')
+def view_study():
+	return render_template('index.html')
 
 # Temporary single page for viewing a single WSI - testing only.
 @app.route('/view_single')

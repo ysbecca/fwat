@@ -1,5 +1,7 @@
 <!-- {% extends "base.html" %} -->
 
+{% set full_screen_view = "True" %}
+
 {% block content %}
 
 <div class="row">
@@ -14,7 +16,6 @@
 			Image ID: <div id="image_id">{{ image_id }}</div></br>
 			<!-- Image directory: {{ image_dir }} </br> -->
 			Image name: {{ file_name }} </br>
-		
 		
 			<br/></br>
 			<button type="button" id="reset_button" class="btn btn-warning">Reset annotations</button></br>

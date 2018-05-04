@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% set active_page = "studies" %}
+
+{% block content %}
+
+
+<h3>Create a new study</h3>
+
+{% from "macros.html" import render_field %}
+<form method=post>
+  <dl>
+    {{ render_field(form.name) }}
+    {{ render_field(form.images) }}
+  </dl>
+  <p><input type=submit value="Create new study">
+</form>
+
+{% endblock %}
