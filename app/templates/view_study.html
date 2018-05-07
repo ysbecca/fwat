@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% set active_page = "studies" %}
+
+{% block content %}
+<div class="container-fluid">
+<br/>
+<p class="lead">Viewing a Study</p>
+
+<br/>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{ study.name }}</h3>
+  </div>
+  <div class="panel-body">
+ 
+    <!-- study here -->
+    {{ study.description }}
+    <br/><br/>
+
+    <p>This study uses the <strong>{{ dataset.name }}</strong> dataset consisting of {{ image_count }} image(s).</p>
+    <br/>
+
+    <h4>Link to share study:</h4>
+
+    <em>NOTE: Remember to share the study access code to give participants access to the study.</em>
+    <br/></br/>
+    <button type="button" name="submit" class="btn btn-default">
+      {{ link_to('run_study', "Run study", study_id=study.id) }}
+    </button>
+
+  </div>
+</div>
+
+</div>
+
+
+
+
+
+{% endblock %}

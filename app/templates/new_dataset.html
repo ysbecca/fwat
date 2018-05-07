@@ -23,7 +23,7 @@ A <strong>Dataset</strong> is a set of images which can be used for a study.
         <div class="form-group">{{ render_field(form.name, class="form-control") }}  </div>
         <div class="form-group">{{ render_field(form.directory, class="form-control") }}  </div>
 
-        <p>Images may be selected individually or by folders. Only the image name is stored, and images must be located in the directory specified above, or in one of its sub-directories.</p>
+        <p>Images may be selected individually or by folders. Only the image name is stored, and images must be located in the directory specified above.</p>
         <input id="images" name="images[]" type="file" class="file" multiple>
         <!-- TODO modify JS so as to NOT upload the file contents. -->
       </dl>

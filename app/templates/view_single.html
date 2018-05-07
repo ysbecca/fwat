@@ -11,10 +11,9 @@
 	<div class="col col-md-2">
 	    <div class="row">
     	
-		    <h5>Slide details</h5>
-		    
-			Image ID: <div id="image_id">{{ image_id }}</div></br>
-			<!-- Image directory: {{ image_dir }} </br> -->
+		    <h4>{{ study.name }} Study</h4>
+
+			<div id="image_id" style="display: none;">{{ image_id }}</div></br>
 			Image name: {{ file_name }} </br>
 		
 			<br/></br>
@@ -24,20 +23,25 @@
 			<br/></br>
 			<p>
 				<div class="btn-group" role="group" aria-label="...">
-					<button type="button" id="prev_button" class="btn btn-default">Previous</button>
-					<button type="button" id="next_button" class="btn btn-default">Next&nbsp;&nbsp;</button>
+					<button type="button" id="prev_button" class="btn btn-default">
+						{{ link_to('view_single', "Previous", study_id=study.id, image_num=(image_num-1)) }}
+					</button>
+					<button type="button" id="next_button" class="btn btn-default">
+						{{ link_to('view_single', "Next  ", study_id=study.id, image_num=(image_num+1)) }}
+					</button>
 				</div>
+				<br/>
+				<strong>Image {{ image_num }} of {{ image_count }}</strong>
 			</p>
-			
 		</div>
 	</div>
 </div>
 
 
-<script type="text/javascript" src="static/jquery.js"></script>
-<script type="text/javascript" src="static/openseadragon/openseadragon.js"></script>
-<script type="text/javascript" src="static/openseadragon/openseadragon-scalebar.js"></script>
-<script type="text/javascript" src="static/openseadragon-annotations/dist/openseadragon-annotations.js"></script>
+<script type="text/javascript" src="{{url_for('static', filename='jquery.js')}}""></script>
+<script type="text/javascript" src="{{url_for('static', filename='openseadragon/openseadragon.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='openseadragon/openseadragon-scalebar.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='openseadragon-annotations/dist/openseadragon-annotations.js')}}"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -49,7 +53,7 @@
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
 	    var viewer = new OpenSeadragon({
 	        id: "view_slide",
-	        prefixUrl: "static/openseadragon/images/",
+	        prefixUrl: "{{url_for('static', filename='openseadragon/images/')}}",
 	        timeout: 120000,
 	        animationTime: 0.25,
 	        blendTime: 0.1,

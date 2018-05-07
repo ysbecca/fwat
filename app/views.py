@@ -1,7 +1,7 @@
 from app import app
 from app.models import *
 
-from flask import render_template, make_response, url_for, abort, request, flash
+from flask import render_template, make_response, url_for, abort, request, flash, redirect
 import openslide
 from openslide import ImageSlide, open_slide
 from openslide.deepzoom import DeepZoomGenerator
@@ -42,18 +42,50 @@ def new_dataset():
 
 # @app.route('/view/<int:study_id>/<int:image_id>')
 
+@app.route('/run_study/<int:study_id>')
+def run_study(study_id):
+	study = Study.query.get(study_id)
+	dataset = study.dataset
+	image_num = 0
+	# return redirect(url_for('/view_single', 
+						# study_id=study.id,
+						# dataset_id=dataset.id, 
+						# image_num=0))
+	return view_single(study.id, dataset.id, 0)
 
-@app.route('/view_study')
-def view_study():
-	return render_template('index.html')
+@app.route('/view_study/<int:study_id>')
+def view_study(study_id):
+	study = Study.query.get(study_id)
+	dataset = study.dataset
+	image_count = dataset.images.count()
+
+	return render_template('view_study.html',
+							study=study,
+							dataset=dataset,
+							image_count=image_count)
 
 # Temporary single page for viewing a single WSI - testing only.
-@app.route('/view_single')
-def view_single():
-	# Eventually, will load the image object from DB instead of hard coded here.
-	image_id = 102
-	image_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/Case_0001/"
-	file_name = "A01.svs"
+@app.route('/view_single/<int:study_id>/<int:image_num>')
+def view_single(study_id, image_num):
+
+	# Test case only
+	if study_id == -1:
+		image_id = 102
+		image_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/Case_0001/"
+		file_name = "A01.svs"
+	else:
+		study = Study.query.get(study_id)
+		dataset = study.dataset
+		image_count = dataset.images.count()
+		if image_num >= image_count or image_num < 0:
+			print("At end or beginning of study.")
+			# Redirect to study page - study completed, or back to beginning.
+			return redirect(url_for('/view_study', study_id=study_id))
+		else:
+			image = dataset.images[image_num]
+			image_id = image.id
+			image_dir = image.file_dir
+			file_name = image.file_name
 
 	# Set single WSI options
 	config_map = {
@@ -62,14 +94,16 @@ def view_single():
 	    'DEEPZOOM_LIMIT_BOUNDS': 'limit_bounds',
 	}
 	opts = dict((v, app.config[k]) for k, v in config_map.items())
-
+	print("========= " + image_dir + file_name + " ==========")
 	slide = open_slide(image_dir + file_name)
+
 	# Fetch the x and y dimensions of the original WSI
 	if not slide: 
 		associated_urls = {}
 		file_name = "ERROR: unable to load image " + file_name + " at " + image_dir
 	else:
 		x, y = slide.dimensions
+		print("X, Y: " + str(x) + ", " + str(y))
 
 		try:
 		    mpp_x = slide.properties[openslide.PROPERTY_NAME_MPP_X]
@@ -79,7 +113,7 @@ def view_single():
 			app.slide_mpp = 0
 
 		# Save globally in app config variables
-		slide_slug = file_name
+		slide_slug = slugify(file_name)
 		app.slides = {
 			slide_slug: DeepZoomGenerator(slide, **opts)
 		}
@@ -103,7 +137,11 @@ def view_single():
             image_id=image_id,
             image_dir=image_dir,
             file_name=file_name,
-            x=x, y=y)
+            x=x, y=y,
+            study=study,
+            dataset_id=dataset.id,
+            image_num=image_num,
+            image_count=image_count)
 
 
 @app.route('/save_annotations', methods=['POST'])

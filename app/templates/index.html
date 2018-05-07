@@ -9,7 +9,6 @@
 	A Fast Whole-slide image Annotation Tool for gathering annotations on whole-slide images.
 </p>
 
-{{ link_to('view_single', "View a single WSI - test") }}
 
 <br/><br/><br/><br/>
 <!-- Show all existing studies and datasets -->
@@ -36,7 +35,7 @@
   <div class="panel-body">
 	<ul class="list-group">
 		{% for study in studies %}
-			<li class="list-group-item">{{ link_to('view_study', study.name) }}</li>
+			<li class="list-group-item">{{ link_to('view_single', study.name, study_id=study.id, image_num=0) }}</li>
 		{% endfor %}
 	</ul>
 
