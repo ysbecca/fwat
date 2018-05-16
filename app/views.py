@@ -69,26 +69,14 @@ def view_study(study_id):
 def view_single(study_id, image_num):
 
 	# Test case only
-	if study_id == -1:
-		image_id = 102
-		image_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/Case_0001/"
-		file_name = "A01.svs"
-	else:
-		study = Study.query.get(study_id)
-		dataset = study.dataset
-		image_count = dataset.images.count()
-		if image_num >= image_count or image_num < 0:
-			print("At end or beginning of study.")
-			# Redirect to study page - study completed, or back to beginning.
-			return render_template('view_study.html',
-						study=study,
-						dataset=dataset,
-						image_count=image_count)
-		else:
-			image = dataset.images[image_num]
-			image_id = image.id
-			image_dir = image.file_dir
-			file_name = image.file_name
+	if study_id == 0:
+		image_id = 0
+		image_dir = app.config['TEST_WSI_DIR']
+		file_name = app.config['TEST_WSI_FILE_NAME']
+		study = None
+		dataset = None
+		image_count = 1
+
 
 	# Set single WSI options
 	config_map = {
@@ -142,7 +130,7 @@ def view_single(study_id, image_num):
             file_name=file_name,
             x=x, y=y,
             study=study,
-            dataset_id=dataset.id,
+            dataset=dataset,
             image_num=image_num,
             image_count=image_count)
 

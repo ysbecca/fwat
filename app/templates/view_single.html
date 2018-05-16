@@ -11,7 +11,7 @@
 	<div class="col col-md-2">
 	    <div class="row">
     	
-		    <h4>{{ study.name }} Study</h4>
+		    <h4>{{ study.name }} Test Study</h4>
 
 			<div id="image_id" style="display: none;">{{ image_id }}</div></br>
 			Image name: {{ file_name }} </br>
@@ -22,16 +22,7 @@
 			<button type="button" id="save_button" class="btn btn-success">Save annotations&nbsp;</button></br>
 			<br/></br>
 			<p>
-				<div class="btn-group" role="group" aria-label="...">
-					<button type="button" id="prev_button" class="btn btn-default">
-						{{ link_to('view_single', "Previous", study_id=study.id, image_num=(image_num-1)) }}
-					</button>
-					<button type="button" id="next_button" class="btn btn-default">
-						{{ link_to('view_single', "Next  ", study_id=study.id, image_num=(image_num+1)) }}
-					</button>
-				</div>
-				<br/>
-				<strong>Image {{ image_num + 1 }} of {{ image_count }}</strong>
+			
 			</p>
 		</div>
 	</div>
