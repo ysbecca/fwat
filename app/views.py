@@ -80,7 +80,10 @@ def view_single(study_id, image_num):
 		if image_num >= image_count or image_num < 0:
 			print("At end or beginning of study.")
 			# Redirect to study page - study completed, or back to beginning.
-			return redirect(url_for('/view_study', study_id=study_id))
+			return render_template('view_study.html',
+						study=study,
+						dataset=dataset,
+						image_count=image_count)
 		else:
 			image = dataset.images[image_num]
 			image_id = image.id

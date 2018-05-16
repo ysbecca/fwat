@@ -35,7 +35,7 @@
   <div class="panel-body">
 	<ul class="list-group">
 		{% for study in studies %}
-			<li class="list-group-item">{{ link_to('view_single', study.name, study_id=study.id, image_num=0) }}</li>
+			<li class="list-group-item">{{ link_to('view_study', study.name, study_id=study.id, image_num=0) }}</li>
 		{% endfor %}
 	</ul>
 
