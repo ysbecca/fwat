@@ -1,5 +1,5 @@
 from app import app
-from app.models import *
+# from app.models import *
 
 from flask import render_template, make_response, url_for, abort, request, flash, redirect
 import openslide
@@ -11,47 +11,47 @@ from io import BytesIO
 import json
 import ast
 
-@app.route('/')
-def index():
-    user = {'name': 'Rebecca Stone'}
+# @app.route('/')
+# def index():
+#     user = {'name': 'Rebecca Stone'}
 
-    # Show all the datasets and studies on the dashboard
-    datasets = Dataset.query.all()
-    studies = Study.query.all()
+#     # Show all the datasets and studies on the dashboard
+#     datasets = Dataset.query.all()
+#     studies = Study.query.all()
 
-    return render_template('index.html',
-    					   datasets=datasets,
-    					   studies=studies,
-                           user=user)
+#     return render_template('index.html',
+#     					   datasets=datasets,
+#     					   studies=studies,
+#                            user=user)
 
-@app.route('/new_dataset', methods=['GET', 'POST'])
-def new_dataset():
-	form = DatasetForm(request.form)
-	if request.method == 'POST' and form.validate():
-		print(form.name.data)
-		print(form.directory.data)
-		print(form.images.data)
+# @app.route('/new_dataset', methods=['GET', 'POST'])
+# def new_dataset():
+# 	form = DatasetForm(request.form)
+# 	if request.method == 'POST' and form.validate():
+# 		print(form.name.data)
+# 		print(form.directory.data)
+# 		print(form.images.data)
 
-		# dataset = Dataset(form.name.data, form.images.data)
-		# db_session.add(dataset)
+# 		# dataset = Dataset(form.name.data, form.images.data)
+# 		# db_session.add(dataset)
 
-		flash('New dataset created:' + str(form.name.data))
-		return redirect(url_for('/new_dataset'))
+# 		flash('New dataset created:' + str(form.name.data))
+# 		return redirect(url_for('/new_dataset'))
 
-	return render_template('new_dataset.html', form=form)
+# 	return render_template('new_dataset.html', form=form)
 
-# @app.route('/view/<int:study_id>/<int:image_id>')
+# # @app.route('/view/<int:study_id>/<int:image_id>')
 
-@app.route('/run_study/<int:study_id>')
-def run_study(study_id):
-	study = Study.query.get(study_id)
-	dataset = study.dataset
-	image_num = 0
-	# return redirect(url_for('/view_single', 
-						# study_id=study.id,
-						# dataset_id=dataset.id, 
-						# image_num=0))
-	return view_single(study.id, dataset.id, 0)
+# @app.route('/run_study/<int:study_id>')
+# def run_study(study_id):
+# 	study = Study.query.get(study_id)
+# 	dataset = study.dataset
+# 	image_num = 0
+# 	# return redirect(url_for('/view_single', 
+# 						# study_id=study.id,
+# 						# dataset_id=dataset.id, 
+# 						# image_num=0))
+# 	return view_single(study.id, dataset.id, 0)
 
 @app.route('/view_study/<int:study_id>')
 def view_study(study_id):
@@ -149,7 +149,7 @@ def save_annotations():
 
     # Create "save_annotation" function of Image model.
     # It does parsing and saving.
-    Image.save_new_annotations_file(svg_path_string, wsi_x, wsi_y)
+    # Image.save_new_annotations_file(svg_path_string, wsi_x, wsi_y)
 
     return json.dumps({'status':'OK','data': str(paths) });
 

@@ -9,8 +9,8 @@ TEST_WSI_DIR = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/Case_000
 TEST_WSI_FILE_NAME = "A01.svs"
 
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_TRACK_MODIFICATIONS = True
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+# SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 # DB in progress
