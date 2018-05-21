@@ -5,27 +5,7 @@
 {% block content %}
 
 <div class="row">
-	<div class="col col-md-10">
-		<div id="view_slide"></div>
-	</div>
-	<div class="col col-md-2">
-	    <div class="row">
-    	
-		    <h4>{{ study.name }} Test Study</h4>
-
-			<div id="image_id" style="display: none;">{{ image_id }}</div></br>
-			Image name: {{ file_name }} </br>
-		
-			<br/></br>
-			<button type="button" id="reset_button" class="btn btn-warning">Reset annotations</button></br>
-			<br/>
-			<button type="button" id="save_button" class="btn btn-success">Save annotations&nbsp;</button></br>
-			<br/></br>
-			<p>
-			
-			</p>
-		</div>
-	</div>
+	<div id="view_slide"></div>
 </div>
 
 
@@ -37,40 +17,53 @@
 
 	$(document).ready(function() {
 
-		var wsi_x = parseInt("{{ x }}");
-		var wsi_y = parseInt("{{ y }}");
-		var image_id = parseInt($("div#image_id").text())
+		var wsi_x 		= parseInt("{{ x }}");
+		var wsi_y 		= parseInt("{{ y }}");
+		var image_id 	= parseInt($("div#image_id").text())
 
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
+		
 	    var viewer = new OpenSeadragon({
-	        id: "view_slide",
-	        prefixUrl: "{{url_for('static', filename='openseadragon/images/')}}",
-	        timeout: 120000,
-	        animationTime: 0.25,
-	        blendTime: 0.1,
+		
+	        id: 				"view_slide",
+	        prefixUrl: 			"{{url_for('static', filename='openseadragon/images/')}}",
+	        timeout: 			120000,
+	        animationTime: 		0.25,
+	        blendTime: 			0.1,
 	        constrainDuringPan: true,
-	        maxZoomPixelRatio: 2,
-	        minZoomLevel: 1,
-	        visibilityRatio: 1,
-	        zoomPerScroll: 2,
-
-	    });
+	        maxZoomPixelRatio: 	2,
+	        minZoomLevel: 		1,
+	        visibilityRatio: 	1,
+	        zoomPerScroll: 		2,
+			
+	    }); // var viewer = new OpenSeadragon
+		
+		
 	    viewer.addHandler("open", function() {
-	        // To improve load times, ignore the lowest-resolution Deep Zoom
-	        // levels.  This is a hack: we can't configure the minLevel via
-	        // OpenSeadragon configuration options when the viewer is created
-	        // from DZI XML.
+	        /*
+				To improve load times, ignore the lowest-resolution Deep Zoom
+				levels.  This is a hack: we can't configure the minLevel via
+				OpenSeadragon configuration options when the viewer is created
+				from DZI XML.
+			*/
 	        viewer.source.minLevel = 8;
-	    });
-	    viewer.scalebar({
-	        xOffset: 10,
-	        yOffset: 10,
-	        barThickness: 3,
-	        color: '#555555',
-	        fontColor: '#333333',
-	        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-	    });
+	    }); // viewer.addHandler("open"
+		
+		
+		/*
+			Scale bar styling
+		*/
+	    
+		viewer.scalebar({
+	        xOffset: 			10,
+	        yOffset: 			10,
+	        barThickness: 		3,
+	        color: 				'#555555',
+	        fontColor: 			'#333333',
+	        backgroundColor: 	'rgba(255, 255, 255, 0.5)',
+	    }); // viewer.scalebar
 
+		
 	    function open_slide(url, mpp) {
 	        var tile_source;
 	        if (dzi_data[url]) {
@@ -88,28 +81,53 @@
 	        });
 	        
 	        viewer.initializeAnnotations();
-	    }
+			
+	    } // function open_slide
+		
 
 	    open_slide("{{ slide_url }}", parseFloat('{{ slide_mpp }}'));
+		
+		/*
+			Load Slide
+		*/
+		
 	    $(".load-slide").click(function(ev) {
+		
 	        $(".current-slide").removeClass("current-slide");
 	        $(this).parent().addClass("current-slide");
-	        open_slide($(this).attr('data-url'),
-	                parseFloat($(this).attr('data-mpp')));
+			
+	        open_slide(
+				$(this).attr('data-url'), 
+				parseFloat(
+					$(this).attr('data-mpp')
+				)
+			);
+			
 	        ev.preventDefault();
-	    });
+	    }); // .load-slide
 
-     	// Handlers for button actions
+		
+     	/*
+			Reset button
+		*/
+		
 		$( "#reset_button" ).click(function() {
   			console.log( "Handler for .reset_button called." );
   			viewer.annotations.clean();
-		});
+		}); // #reset_button
 
+		
+		/*
+			Save button
+		*/
+		
 		$( "#save_button" ).click(function() {
+		
   			console.log( "Handler for .save_button called." );
   			var annotations = viewer.annotations.get();
   			var all_paths = []
 
+			
   			for (var i = 0; i < annotations.length; i++) {
   				if (i % 2 == 1) {
   					// Odd
@@ -117,8 +135,9 @@
   					// console.log(path_data); // The SVG coordinates to send back to server.
   					all_paths.push(path_data);
   				}
-  			}
+  			} // for annotations.length
 
+			
   			var all_data = {paths: all_paths, image_id: image_id, wsi_x: wsi_x, wsi_y: wsi_y};
   			console.log(all_data)
 			$.ajax({
@@ -132,16 +151,11 @@
 	            error: function(error) {
 	                console.log(error);
 	            }
-	        });
-		});
-
-		$( "#prev_button" ).click(function() {
-  			console.log( "Handler for .prev_button called." );
-		});
-		$( "#next_button" ).click(function() {
-  			console.log( "Handler for .next_button called." );
-		});
-	});
+	        }); // $.ajax
+			
+		}); // #save_button
+		
+	}); // $(document).ready
 
 </script>
 
