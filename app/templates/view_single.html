@@ -11,9 +11,8 @@
 	<div class="col col-md-2">
 	    <div class="row">
     	
-		    <h4>{{ study.name }} Study</h4>
+		    <h4>{{ study }} Study</h4>
 
-			<div id="image_id" style="display: none;">{{ image_id }}</div>
 			<div id="file_name" style="display: none;">{{ file_name }}</div></br>
 			Image name: {{ file_name }} </br>
 		
@@ -28,10 +27,10 @@
 			<p>
 				<div class="btn-group" role="group" aria-label="...">
 					<button type="button" id="prev_button" class="btn btn-default">
-						{{ link_to('view_single', "Previous", study_id=study.id, image_num=(image_num-1)) }}
+						{{ link_to('view_single', "Previous", image_num=(image_num-1)) }}
 					</button>
 					<button type="button" id="next_button" class="btn btn-default">
-						{{ link_to('view_single', "Next  ", study_id=study.id, image_num=(image_num+1)) }}
+						{{ link_to('view_single', "Next  ", image_num=(image_num+1)) }}
 					</button>
 				</div>
 				<br/>
@@ -53,7 +52,6 @@
 
 		var wsi_x = parseInt("{{ x }}");
 		var wsi_y = parseInt("{{ y }}");
-		var image_id = parseInt($("div#image_id").text())
 		var file_name = $("div#file_name").text()
 
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
@@ -164,7 +162,6 @@
 
   			var all_data = {
   				paths: all_paths, 
-  				image_id: image_id, 
   				wsi_x: wsi_x, 
   				wsi_y: wsi_y, 
   				code: code,

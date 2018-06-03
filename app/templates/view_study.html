@@ -11,23 +11,19 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">{{ study.name }}</h3>
+    <h3 class="panel-title">{{ study }}</h3>
   </div>
   <div class="panel-body">
  
     <!-- study here -->
-    {{ study.description }}
     <br/><br/>
 
-    <p>This study uses the <strong>{{ dataset.name }}</strong> dataset consisting of {{ image_count }} image(s).</p>
+    <p>This study uses the <strong>{{ dataset }}</strong> dataset consisting of {{ image_count }} image(s).</p>
     <br/>
 
-    <h4>Link to share study:</h4>
-
-    <em>NOTE: Remember to share the study access code to give participants access to the study.</em>
     <br/></br/>
     <button type="button" name="submit" class="btn btn-default">
-      {{ link_to('view_single', "Run study", study_id=study.id, image_num=0) }}
+      {{ link_to('view_single', "Run study", image_num=0) }}
     </button>
 
   </div>

@@ -21,7 +21,7 @@
 
 	<ul class="list-group">
 		{% for dataset in datasets %}
-			<li class="list-group-item"><a href="#">{{ dataset.name }}</a></li>
+			<li class="list-group-item"><a href="#">{{ dataset }}</a></li>
 		{% endfor %}
 	</ul>
 
@@ -35,7 +35,7 @@
   <div class="panel-body">
 	<ul class="list-group">
 		{% for study in studies %}
-			<li class="list-group-item">{{ link_to('view_study', study.name, study_id=study.id, image_num=0) }}</li>
+			<li class="list-group-item">{{ link_to('view_study', study, study_id=1, image_num=0) }}</li>
 		{% endfor %}
 	</ul>
 

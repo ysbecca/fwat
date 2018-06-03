@@ -33,9 +33,7 @@
 
     <!-- Navigation bar sticking to top -->
     {% set navigation_bar = [
-        ('/', 'dashboard', 'Dashboard'),
         ('/new_study', 'studies', 'Studies'),
-        ('/new_dataset', 'datasets', 'Datasets')
     ] -%}
 
     {% set active_page = active_page|default('dashboard') -%}
