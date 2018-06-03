@@ -6,7 +6,9 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
-# DB in progress
+# Annotation saving directories
+ANNOTATION_DIR = "/Users/ysbecca/ysbecca-projects/fwat/temp/"
+ANNOTATION_TYPES = ["EP", "SM"]
 
 
 DEEPZOOM_SLIDE=None		# View one slide at a time

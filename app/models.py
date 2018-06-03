@@ -1,9 +1,10 @@
-from app import db
+from app import db, app
 from wtforms import Form, BooleanField, StringField, PasswordField, TextAreaField, SelectField, validators
+import json
+
 
 # TODO Placeholder until we have created datasets
 TEMP_DATASET_CHOICES = [(1, 'Colorectal Cancer Leeds'),(2, 'NHS BCSP All')]
-
 
 
 class DatasetForm(Form):
@@ -23,10 +24,6 @@ class StudyForm(Form):
 
     hide_annotated_images = BooleanField('Hide images once annotated', [validators.DataRequired()])
     code = StringField('Set the access code for all study participants', [validators.Length(min=6, max=20)])
-
-# class Admin(db.Model):
-	# id = db.Column(db.Integer, primary_key=True)
-	# name = db.Column(db.String(100), unique=True)
 
 class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -64,33 +61,39 @@ class Image(db.Model):
 	def __repr__(self):
 		return '' % (self.id, self.file_name, self.file_dir)
 
-	def convert_path_coords(svg_path_string, wsi_x, wsi_y):
-		''' Converts from SVG (100, 100) no aspect ratio preserved viewBox to WSI original coords. '''
-		all_coords = []
-		x_factor, y_factor = wsi_x / 100.0, wsi_y / 100.0
 
-		for path in paths:
-		    split_path = path.replace("M", ",").replace("L", ",").split(",")[1:]
-		    split_path = list(map(str.strip, split_path))
+# Extra helper functions
+def convert_path_coords(paths, wsi_x, wsi_y):
+	''' Converts from SVG (100, 100) no aspect ratio preserved viewBox to WSI original coords. '''
+	all_coords = []
+	x_factor, y_factor = wsi_x / 100.0, wsi_y / 100.0
 
-		    coords_array = []
-		    for coord in split_path:
-		        x, y = coord.split(" ")
-		        coords_array.append([round(x_factor*float(x), 2), round(y_factor*float(y), 2)])
-		    all_coords.append(coords_array)
-		return all_coords
+	for path in paths:
+	    split_path = path.replace("M", ",").replace("L", ",").split(",")[1:]
+	    split_path = list(map(str.strip, split_path))
 
-	def save_new_annotations_file(svg_path_string, wsi_x, wsi_y):
-		# Saves WSI coordinates into an Aperio XML file.
+	    coords_array = []
+	    for coord in split_path:
+	        x, y = coord.split(" ")
+	        coords_array.append([round(x_factor*float(x), 2), round(y_factor*float(y), 2)])
+	    all_coords.append(coords_array)
+	return all_coords
 
-		coords = convert_path_coords(svg_path_string, wsi_x, wsi_y)
+def save_new_annotations_file(svg_path_string, wsi_x, wsi_y, code, file_name):
+	# Saves WSI coordinates.
+	coords = convert_path_coords(svg_path_string, wsi_x, wsi_y)
 
-		if len(coords):
-			print(coords)
+	if len(coords):
+		annotation_file = file_name + "_" + code + ".json"
+		print(annotation_file, "saving to", app.config["ANNOTATION_DIR"])
 
-			# TODO save using image file_name (self.file_name)
-			print("Successful conversion and save.")
-			# Return success message.
-			return True
-		else:
-			return False
+		with open(app.config["ANNOTATION_DIR"] + annotation_file, 'w') as outfile:
+			json.dump(coords, outfile)
+
+		return True
+	else:
+		print("No coordinates to save.")
+		return False
+
+
+

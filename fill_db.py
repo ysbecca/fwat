@@ -1,22 +1,38 @@
 from app import app, db, models
+import csv
 
-d1 = models.Dataset(name="BACH Challenge WSI", directory="/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/")
 
-d2 = models.Dataset(name="Colorectal cancer trials", directory="/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/")
+# Set general variables.
+dataset_name = "BCSP Expert Training Set"
+study_name = dataset_name + " Study"
+study_desc = "Annotation of training set for submucosa and epithelial layers."
 
-i1 = models.Image(file_name="01.svs", file_dir="/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/", dataset_id=1)
-i2 = models.Image(file_name="02.svs", file_dir="/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/", dataset_id=1)
-i3 = models.Image(file_name="03.svs", file_dir="/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/", dataset_id=1)
+case_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_no_xml/"
 
-s1 = models.Study(name="Colorectal tumour segmentation", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in lacus malesuada, ornare quam sed, suscipit urna. Nunc scelerisque varius nisi eget ornare. Fusce ut blandit ipsum. Nullam posuere faucibus sapien, sed dignissim eros viverra lobortis. Aenean in tincidunt augue. Sed sagittis orci in eleifend viverra. Etiam ultricies nunc neque, eget rhoncus sapien ornare et. Etiam eget odio mattis, hendrerit lacus ut, sollicitudin turpis.", dataset_id=1)
+csv_path = "/Users/ysbecca/ysbecca-projects/bcsp-expert/training_cases_only.csv"
 
-db.session.add(d1)
-db.session.add(d2)
-db.session.add(i1)
-db.session.add(i2)
-db.session.add(i3)
-db.session.add(s1)
 
+# Read case numbers from CSV file.
+image_paths = []
+
+
+
+dataset = models.Dataset(name=dataset_name, directory=case_dir)
+
+# Make an object for each image in the dataset.
+images = []
+for image_path in image_paths:
+	images.append(models.Image(file_name="01.svs", file_dir=image_path, dataset_id=dataset.id))
+
+
+study = models.Study(name=study_name, description=study_desc, dataset_id=dataset.id)
+
+# Add and commit all objects.
+db.session.add(dataset)
+for image in images:
+	db.session.add(image)
+
+db.session.add(study)
 print("Committing now...")
 
 db.session.commit()

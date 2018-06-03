@@ -68,6 +68,7 @@ def view_study(study_id):
 @app.route('/view_single/<int:study_id>/<int:image_num>')
 def view_single(study_id, image_num):
 
+
 	# Test case only
 	if study_id == -1:
 		image_id = 102
@@ -144,7 +145,8 @@ def view_single(study_id, image_num):
             study=study,
             dataset_id=dataset.id,
             image_num=image_num,
-            image_count=image_count)
+            image_count=image_count,
+            annotation_types=app.config['ANNOTATION_TYPES'])
 
 
 @app.route('/save_annotations', methods=['POST'])
@@ -158,12 +160,13 @@ def save_annotations():
     paths = parsed_data["paths"]
     image_id = parsed_data["image_id"]
     wsi_x, wsi_y = parsed_data["wsi_x"], parsed_data["wsi_y"]
+    code = parsed_data["code"]
+    file_name = parsed_data["file_name"]
 
-    # Create "save_annotation" function of Image model.
-    # It does parsing and saving.
-    Image.save_new_annotations_file(svg_path_string, wsi_x, wsi_y)
+    # Parse and save annotations
+    state = save_new_annotations_file(paths, wsi_x, wsi_y, code, file_name[:-4])
 
-    return json.dumps({'status':'OK','data': str(paths) });
+    return json.dumps({'status': state, 'data': str(paths) });
 
 
 @app.route('/<slug>.dzi')

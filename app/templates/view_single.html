@@ -13,14 +13,18 @@
     	
 		    <h4>{{ study.name }} Study</h4>
 
-			<div id="image_id" style="display: none;">{{ image_id }}</div></br>
+			<div id="image_id" style="display: none;">{{ image_id }}</div>
+			<div id="file_name" style="display: none;">{{ file_name }}</div></br>
 			Image name: {{ file_name }} </br>
 		
 			<br/></br>
-			<button type="button" id="reset_button" class="btn btn-warning">Reset annotations</button></br>
+			<button type="button" id="reset_button" class="btn btn-warning">(R) Reset annotations</button></br>
 			<br/>
-			<button type="button" id="save_button" class="btn btn-success">Save annotations&nbsp;</button></br>
-			<br/></br>
+			
+			{% for code in annotation_types %}
+				<button type="button" value="{{ code }}" class="save_button btn btn-success">({{code[0]}}) Save {{ code }} annotations</button></br><br/>
+			{% endfor %}
+			</br>
 			<p>
 				<div class="btn-group" role="group" aria-label="...">
 					<button type="button" id="prev_button" class="btn btn-default">
@@ -33,6 +37,7 @@
 				<br/>
 				<strong>Image {{ image_num + 1 }} of {{ image_count }}</strong>
 			</p>
+			<div id="save_status"></div></br>
 		</div>
 	</div>
 </div>
@@ -49,6 +54,7 @@
 		var wsi_x = parseInt("{{ x }}");
 		var wsi_y = parseInt("{{ y }}");
 		var image_id = parseInt($("div#image_id").text())
+		var file_name = $("div#file_name").text()
 
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
 	    var viewer = new OpenSeadragon({
@@ -62,8 +68,8 @@
 	        minZoomLevel: 1,
 	        visibilityRatio: 1,
 	        zoomPerScroll: 2,
-
 	    });
+
 	    viewer.addHandler("open", function() {
 	        // To improve load times, ignore the lowest-resolution Deep Zoom
 	        // levels.  This is a hack: we can't configure the minLevel via
@@ -110,12 +116,40 @@
 
      	// Handlers for button actions
 		$( "#reset_button" ).click(function() {
-  			console.log( "Handler for .reset_button called." );
-  			viewer.annotations.clean();
+  			reset();
 		});
 
-		$( "#save_button" ).click(function() {
-  			console.log( "Handler for .save_button called." );
+		// Handle keypress shortcuts - for now hard-coded into the system 
+		// TODO take first letter from config array annotation types
+		$(document).on('keyup keydown keypress', function(event) {
+            switch (event.keyCode) { 
+                case 114: // R for reset
+                	reset();
+                	break;
+                case 101: // E for epithelial layer
+                	save_annotations("EP");
+                	break;
+                case 115:
+                	save_annotations("SM");
+                	break;
+                default: 
+                	// Some other unrecognised key was pressed; ignore.
+                	break;
+            }
+        });
+
+		$(".save_button").click(function() {
+  			var code = $(this).val()
+  			save_annotations(code);
+  		});
+
+		function reset() {
+			viewer.annotations.clean();
+  			$("#save_status").text("");
+		}
+
+  		function save_annotations(code) {
+  			console.log("save_annotations called with code: " + code)
   			var annotations = viewer.annotations.get();
   			var all_paths = []
 
@@ -128,21 +162,31 @@
   				}
   			}
 
-  			var all_data = {paths: all_paths, image_id: image_id, wsi_x: wsi_x, wsi_y: wsi_y};
-  			console.log(all_data)
+  			var all_data = {
+  				paths: all_paths, 
+  				image_id: image_id, 
+  				wsi_x: wsi_x, 
+  				wsi_y: wsi_y, 
+  				code: code,
+  				file_name: file_name,
+  			};
+
+  			// console.log(all_data)
 			$.ajax({
 	            url: '/save_annotations',
 	            dataType: 'json',
 	            data: JSON.stringify(all_data),
 	            type: 'POST',
 	            success: function(response) {
-	                console.log(response);
+	                // Display the status so we know it's all OK
+	                $("#save_status").text(code + " annotation saved!");
 	            },
 	            error: function(error) {
 	                console.log(error);
+	                $("#save_status").text("Error saving annotation.");
 	            }
 	        });
-		});
+		}
 
 		$( "#prev_button" ).click(function() {
   			console.log( "Handler for .prev_button called." );

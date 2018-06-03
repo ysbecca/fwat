@@ -8,10 +8,12 @@ __pycache__/
 
 migrations/
 .DS_Store
+*.DS_Store
 
 # C extensions
 *.so
 
+/temp/ 
 # Distribution / packaging
 .Python
 env/
