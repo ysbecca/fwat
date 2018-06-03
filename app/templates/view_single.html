@@ -130,6 +130,12 @@
                 case 115:
                 	save_annotations("SM");
                 	break;
+                case 39: // right arrow for Next
+                	change_image('N');
+                	break;
+                case 37: // left arrow for Previous
+                	change_image('P');
+                	break;
                 default: 
                 	// Some other unrecognised key was pressed; ignore.
                 	break;
