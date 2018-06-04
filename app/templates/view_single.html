@@ -27,10 +27,10 @@
 			<p>
 				<div class="btn-group" role="group" aria-label="...">
 					<button type="button" id="prev_button" class="btn btn-default">
-						{{ link_to('view_single', "Previous", image_num=(image_num-1)) }}
+						{{ link_to('view_single', "(C) Previous", image_num=(image_num-1)) }}
 					</button>
 					<button type="button" id="next_button" class="btn btn-default">
-						{{ link_to('view_single', "Next  ", image_num=(image_num+1)) }}
+						{{ link_to('view_single', "(V) Next  ", image_num=(image_num+1)) }}
 					</button>
 				</div>
 				<br/>
@@ -130,11 +130,11 @@
                 case 115:
                 	save_annotations("SM");
                 	break;
-                case 39: // right arrow for Next
-                	change_image('N');
+                case 118: // V key for Next
+                	window.location.href = "{{ url_for('view_single', image_num=(image_num+1)) }}";
                 	break;
-                case 37: // left arrow for Previous
-                	change_image('P');
+                case 99: // C key for Previous
+                	window.location.href = "{{ url_for('view_single', image_num=(image_num-1)) }}";
                 	break;
                 default: 
                 	// Some other unrecognised key was pressed; ignore.
