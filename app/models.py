@@ -1,8 +1,17 @@
 from app import app
 import json
+from os import listdir
+from os.path import isfile, join
+
+# Helper functions (No DB)
 
 
-# Extra helper functions
+def fetch_annotations(file_name):
+	this_dir = app.config["ANNOTATION_DIR"]
+	files = [file for file in listdir(this_dir) if (isfile(join(this_dir, file)) and file_name[:-4] in file)]
+	
+	return files
+
 def convert_path_coords(paths, wsi_x, wsi_y):
 	''' Converts from SVG (100, 100) no aspect ratio preserved viewBox to WSI original coords. '''
 	all_coords = []

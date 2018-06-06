@@ -76,6 +76,11 @@ def view_single(image_num):
 		app.slide_properties = slide.properties
 		slide_url = url_for('dzi', slug=slide_slug)
 
+
+	# Look for any pre-existing annotations to display (on sidebar only)
+	json_files = fetch_annotations(file_name)
+	print(json_files)
+
 	return render_template('view_single.html', slide_url=slide_url,
             slide_mpp=app.slide_mpp,
             image_dir=image_dir,
@@ -85,7 +90,8 @@ def view_single(image_num):
             dataset=dataset,
             image_num=image_num,
             image_count=image_count,
-            annotation_types=app.config['ANNOTATION_TYPES'])
+            annotation_types=app.config['ANNOTATION_TYPES'],
+            saved_annotations=json_files)
 
 
 @app.route('/save_annotations', methods=['POST'])
