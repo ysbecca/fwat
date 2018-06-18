@@ -10,7 +10,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DRAW = False
 
 # Annotation saving directories
-ANNOTATION_DIR = "/home/ufaserv1_k/sc16rsmy/bcsp-expert/annotations/"# "/Users/ysbecca/ysbecca-projects/fwat/temp/"
+# "/home/ufaserv1_k/sc16rsmy/bcsp-expert/annotations/"
+ANNOTATION_DIR = # "/Users/ysbecca/ysbecca-projects/fwat/temp/"
 ANNOTATION_TYPES = ["EP", "SM"]
 
 # Where to read existing annotations from - for displaying
@@ -20,8 +21,10 @@ DATASET = "BCSP Expert Training Set"
 STUDY = "EP/SM Annotation BCSP Expert"
 
 # Case info (equivalent to fill_db.py)
-case_dir = "/nobackup/sc16rsmy/bcsp-expert-cases/" #/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/"
-csv_path = "/home/ufaserv1_k/sc16rsmy/bcsp-expert/training_cases_only.csv"#"/Users/ysbecca/ysbecca-projects/fwat/test_cases.csv"
+# "/nobackup/sc16rsmy/bcsp-expert-cases/" 
+case_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/"
+csv_path = "/Users/ysbecca/ysbecca-projects/fwat/test_cases.csv"
+# "/home/ufaserv1_k/sc16rsmy/bcsp-expert/training_cases_only.csv"
 
 # Read case numbers from CSV file.
 IMAGE_PATHS = []
