@@ -79,7 +79,9 @@ def view_single(image_num):
 
 	# Look for any pre-existing annotations to display (on sidebar only)
 	json_files = fetch_annotations(file_name)
-	print(json_files)
+	coords = []
+	if not app.config["DRAW"]:
+		coords = fetch_coords(json_files)
 
 	return render_template('view_single.html', slide_url=slide_url,
             slide_mpp=app.slide_mpp,
@@ -91,7 +93,9 @@ def view_single(image_num):
             image_num=image_num,
             image_count=image_count,
             annotation_types=app.config['ANNOTATION_TYPES'],
-            saved_annotations=json_files)
+            saved_annotations=json_files,
+            draw=app.config["DRAW"],
+            coords=coords)
 
 
 @app.route('/save_annotations', methods=['POST'])

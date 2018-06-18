@@ -47,15 +47,16 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 </div>
 
 
 <script type="text/javascript" src="{{url_for('static', filename='jquery.js')}}""></script>
 <script type="text/javascript" src="{{url_for('static', filename='openseadragon/openseadragon.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='openseadragon-annotations/dist/openseadragon-svg-overlay.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='openseadragon/openseadragon-scalebar.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='openseadragon-annotations/dist/openseadragon-annotations.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='d3/d3.min.js')}}""></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -122,6 +123,36 @@
 	        ev.preventDefault();
 	    });
 
+
+	    var container_height = viewer.container.clientHeight;
+	    var container_width = viewer.container.clientWidth;
+	    
+	    // Load the annotations
+	    var coords = {{ coords }};
+
+	    svg_coords = fetch_coordinates(coords);
+		
+		
+
+	    // Build the overlay
+       	var svg_overlay = viewer.svgOverlay();
+       	var overlay = d3.select(svg_overlay.node());
+	    var d3path = overlay.append("path")
+                    .attr("stroke", "lawngreen")
+                    .attr("stroke-width", 3)
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .attr("fill", "none")
+                    .attr("d", svg_coords);
+
+        svg_overlay.onClick(d3path.node(), function() {
+            console.log('click', arguments);
+        });
+
+        $(window).resize(function() {
+            svg_overlay.resize();
+        });
+
      	// Handlers for button actions
 		$( "#reset_button" ).click(function() {
   			reset();
@@ -162,6 +193,40 @@
   			$("#save_status").text("");
 		}
 
+		function fetch_coordinates(coords) {
+
+			var x_scale = container_width / wsi_x;
+			var y_scale = container_height / wsi_y;
+
+			var conv_coords = [];
+			// Each json file
+			for (var i = 0; i < coords.length; i++) {
+				var conv_coord = [];
+				for (var j = 0; j < coords[i][0].length; j++) { // Each of the file's annotations
+					conv_coord.push([coords[i][0][j][0] * x_scale, coords[i][0][j][1] * y_scale]); 
+				}
+				conv_coords.push(conv_coord);
+			}
+
+			// Convert to a SVG string.
+			svg_coords = "";
+			for (var i = 0; i < conv_coords.length; i++) {
+				svg_coords += " M";
+				for (var j = 0; j < conv_coords[i].length; j++) {
+					if (j > 0)
+						svg_coords += "L";
+					svg_coords += conv_coords[i][j][0].toString() + " " + 
+									conv_coords[i][j][1].toString() + " ";
+					if (j == conv_coords[i].length - 1)
+						svg_coords += "Z";
+
+				}
+			}
+			console.log(svg_coords);
+			return svg_coords;
+
+		}
+
   		function save_annotations(code) {
   			console.log("save_annotations called with code: " + code)
   			var annotations = viewer.annotations.get();
@@ -183,6 +248,8 @@
   				code: code,
   				file_name: file_name,
   			};
+
+  			console.log(all_paths);
 
 			$.ajax({
 	            url: '/save_annotations',

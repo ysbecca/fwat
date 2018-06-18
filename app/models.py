@@ -12,6 +12,16 @@ def fetch_annotations(file_name):
 	
 	return files
 
+
+def fetch_coords(file_names):
+	all_coords = []
+	for file in file_names:
+		with open(app.config["ANNOTATION_DIR"] + file) as f:
+			data = json.load(f)
+			all_coords.append(data)
+	return all_coords
+
+
 def convert_path_coords(paths, wsi_x, wsi_y):
 	''' Converts from SVG (100, 100) no aspect ratio preserved viewBox to WSI original coords. '''
 	all_coords = []
@@ -28,8 +38,17 @@ def convert_path_coords(paths, wsi_x, wsi_y):
 	    all_coords.append(coords_array)
 	return all_coords
 
+
+def xml_coords_to_svg(coords, wsi_x, wsi_y):
+	''' Converts a numpy array of a list of coordinates to svg coordinates for displaying on the viewBox. '''
+	# app.config["ANNOTATION_RDIR"]
+	x_factor, y_factor = wsi_x / 100.0, wsi_y / 100.0
+	# for c in coords:
+		
+
+
 def save_new_annotations_file(svg_path_string, wsi_x, wsi_y, code, file_name):
-	# Saves WSI coordinates.
+	''' Saves WSI coordinates. '''
 	coords = convert_path_coords(svg_path_string, wsi_x, wsi_y)
 
 	if len(coords):
