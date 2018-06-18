@@ -1,4 +1,8 @@
 from app import app
 
+import socket
 
-app.run(debug=True)
+hostname = socket.gethostbyname(socket.gethostname())
+
+app.run(host=hostname, port=5000, debug=True)
+#app.run(debug=True)
