@@ -14,24 +14,29 @@
 		    <h4>{{ study }} Study</h4>
 
 			<div id="file_name" style="display: none;">{{ file_name }}</div>
-			Image name: {{ file_name }} </br>
-			<br/>
-			<button type="button" id="reset_button" class="btn btn-warning">(R) Reset annotations</button></br>
-			<br/>
+			Image name: {{ file_name }} </br></br>
 			
-			{% for code in annotation_types %}
-				<button type="button" value="{{ code }}" class="save_button btn btn-success">({{code[0]}}) Save {{ code }} annotations</button></br><br/>
-			{% endfor %}
-			<div class="btn-group" role="group" aria-label="...">
-				<button type="button" id="prev_button" class="btn btn-default">
-					{{ link_to('view_single', "(C) Previous", image_num=(image_num-1)) }}
-				</button>
-				<button type="button" id="next_button" class="btn btn-default">
-					{{ link_to('view_single', "(V) Next  ", image_num=(image_num+1)) }}
-				</button>
-			</div><hr/>
-			<div class="alert alert-warning" role="alert"><strong>Image {{ image_num + 1 }} of {{ image_count }}</strong></div>
-			<div class="alert alert-danger" role="alert" id="save_status">No new annotations saved yet.</div>
+			{% if draw %}
+				<br/>
+				<button type="button" id="reset_button" class="btn btn-warning">(R) Reset annotations</button></br>
+				<br/>
+				
+				{% for code in annotation_types %}
+					<button type="button" value="{{ code }}" class="save_button btn btn-success">({{code[0]}}) Save {{ code }} annotations</button></br><br/>
+				{% endfor %}
+			{% endif %}
+				<div class="btn-group" role="group" aria-label="...">
+					<button type="button" id="prev_button" class="btn btn-default">
+						{{ link_to('view_single', "(C) Previous", image_num=(image_num-1)) }}
+					</button>
+					<button type="button" id="next_button" class="btn btn-default">
+						{{ link_to('view_single', "(V) Next  ", image_num=(image_num+1)) }}
+					</button>
+				</div><hr/>
+			{% if draw %}
+				<div class="alert alert-warning" role="alert"><strong>Image {{ image_num + 1 }} of {{ image_count }}</strong></div>
+				<div class="alert alert-danger" role="alert" id="save_status">No new annotations saved yet.</div>
+			{% endif %}
 
 			<!-- Panel for viewing any pre-existing annotations -->
 			<div class="panel panel-default">
@@ -63,7 +68,9 @@
 
 		var wsi_x = parseInt("{{ x }}");
 		var wsi_y = parseInt("{{ y }}");
-		var file_name = $("div#file_name").text()
+		var file_name = $("div#file_name").text();
+		var to_draw = {{ draw }};
+		console.log(to_draw);
 
 	    var dzi_data = {{ dzi_data|default('{}')|safe }};
 	    var viewer = new OpenSeadragon({
@@ -111,7 +118,10 @@
 	            pixelsPerMeter: mpp ? (1e6 / mpp) : 0,
 	        });
 	        
-	        viewer.initializeAnnotations();
+	        if (to_draw) {
+	        	console.log("Activating drawing capability.");
+		        viewer.initializeAnnotations();
+		    }
 	    }
 
 	    open_slide("{{ slide_url }}", parseFloat('{{ slide_mpp }}'));
@@ -123,40 +133,40 @@
 	        ev.preventDefault();
 	    });
 
+	    if (!to_draw) {
+	    	var container_height = viewer.container.clientHeight;
+		    var container_width = viewer.container.clientWidth;
+		    
+		    // Load the annotations
+		    var coords = {{ coords }};
 
-	    var container_height = viewer.container.clientHeight;
-	    var container_width = viewer.container.clientWidth;
-	    
-	    // Load the annotations
-	    var coords = {{ coords }};
-
-	    svg_coords = fetch_coordinates(coords);
+		    svg_coords = fetch_coordinates(coords);
+			
 		
-		
+		    // Build the overlay
+	       	var svg_overlay = viewer.svgOverlay();
+	       	var overlay = d3.select(svg_overlay.node());
+		    var d3path = overlay.append("path")
+	                    .attr("stroke", "mediumseagreen")
+	                    .attr("stroke-width", 3)
+	                    .attr("stroke-linejoin", "round")
+	                    .attr("stroke-linecap", "round")
+	                    .attr("fill", "none")
+	                    .attr("d", svg_coords);
 
-	    // Build the overlay
-       	var svg_overlay = viewer.svgOverlay();
-       	var overlay = d3.select(svg_overlay.node());
-	    var d3path = overlay.append("path")
-                    .attr("stroke", "lawngreen")
-                    .attr("stroke-width", 3)
-                    .attr("stroke-linejoin", "round")
-                    .attr("stroke-linecap", "round")
-                    .attr("fill", "none")
-                    .attr("d", svg_coords);
+	        svg_overlay.onClick(d3path.node(), function() {
+	            console.log('click', arguments);
+	        });
 
-        svg_overlay.onClick(d3path.node(), function() {
-            console.log('click', arguments);
-        });
+	        $(window).resize(function() {
+	            svg_overlay.resize();
+	        });
 
-        $(window).resize(function() {
-            svg_overlay.resize();
-        });
-
-     	// Handlers for button actions
-		$( "#reset_button" ).click(function() {
-  			reset();
-		});
+	     	// Handlers for button actions
+			$( "#reset_button" ).click(function() {
+	  			reset();
+			});
+	    }
 
 		// Handle keypress shortcuts - for now hard-coded into the system 
 		// TODO take first letter from config array annotation types
@@ -222,7 +232,6 @@
 
 				}
 			}
-			console.log(svg_coords);
 			return svg_coords;
 
 		}

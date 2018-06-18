@@ -6,12 +6,12 @@ from os.path import isfile, join
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# If False, then will automatically look for annotations to view.
-DRAW = False
+# If 0, then will automatically look for annotations to view.
+DRAW = 0
 
 # Annotation saving directories
 # "/home/ufaserv1_k/sc16rsmy/bcsp-expert/annotations/"
-ANNOTATION_DIR = # "/Users/ysbecca/ysbecca-projects/fwat/temp/"
+ANNOTATION_DIR = "/Users/ysbecca/ysbecca-projects/fwat/temp/"
 ANNOTATION_TYPES = ["EP", "SM"]
 
 # Where to read existing annotations from - for displaying
