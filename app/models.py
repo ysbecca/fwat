@@ -22,12 +22,11 @@ def fetch_annotations(file_name):
 def fetch_coords(file_names):
 	all_coords, errors = [], []
 	error = 0
-        if app.config["DRAW"]:
-                this_dir = app.config["ANNOTATION_DIR"]
-        else:
-                this_dir = app.config["ANNOTATION_RDIR"]
-
-
+		if app.config["DRAW"]:
+			this_dir = app.config["ANNOTATION_DIR"]
+		else:
+			this_dir = app.config["ANNOTATION_RDIR"]
+			
 	for f in file_names:
 		print("==============", f, "=========")
 		if app.config["IS_XML"]:
