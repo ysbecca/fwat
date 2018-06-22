@@ -3,26 +3,38 @@ import json
 from os import listdir
 from os.path import isfile, join
 
+import urllib.request
+from xml.dom import minidom
+
 # Helper functions (No DB)
 
 
 def fetch_annotations(file_name):
-	this_dir = app.config["ANNOTATION_DIR"]
+	if app.config["DRAW"]:
+		this_dir = app.config["ANNOTATION_DIR"]
+	else:
+		this_dir = app.config["ANNOTATION_RDIR"]
 	files = [file for file in listdir(this_dir) if (isfile(join(this_dir, file)) and file_name[:-4] in file)]
-	
+	print("Files: ", files)
 	return files
 
 
 def fetch_coords(file_names):
 	all_coords, errors = [], []
 	error = 0
+        if app.config["DRAW"]:
+                this_dir = app.config["ANNOTATION_DIR"]
+        else:
+                this_dir = app.config["ANNOTATION_RDIR"]
 
-	for file in file_names:
+
+	for f in file_names:
+		print("==============", f, "=========")
 		if app.config["IS_XML"]:
 			try:
-				xml = minidom.parse(app.config["ANNOTATION_DIR"] + file)
+				xml = minidom.parse(this_dir + f)
 			except:
-				errors.append(file)
+				errors.append(f)
 				error = 1
 			if not error:
 				regions = xml.getElementsByTagName("Region")
@@ -38,9 +50,10 @@ def fetch_coords(file_names):
 						one_coord[i][1] = vertex.attributes['Y'].value
 					coords.append(one_coord)
 				all_coords.append(coords)
+				print("Read", coords)
 		else: # JSON
-			with open(app.config["ANNOTATION_DIR"] + file) as f:
-				data = json.load(f)
+			with open(this_dir + f) as f_:
+				data = json.load(f_)
 				all_coords.append(data)
 
 	print("Annotation file errors: " + str(errors))

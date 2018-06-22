@@ -18,7 +18,7 @@ ANNOTATION_DIR = "/home/ufaserv1_k/sc16rsmy/bcsp-expert/annotations/"
 ANNOTATION_TYPES = ["EP", "SM"]
 
 # Where to read existing annotations from - for displaying
-ANNOTATION_RDIR = "/nobackup/sc16rsmy/bcsp-expert-cases/annotations"
+ANNOTATION_RDIR = "/nobackup/sc16rsmy/bcsp-expert-cases/annotations/"
 # ANNOTATION_RDIR = "/Users/ysbecca/ysbecca-projects/fwat/temp/"
 
 DATASET = "BCSP Expert Training Set"
@@ -28,7 +28,7 @@ STUDY = "EP/SM Annotation BCSP Expert"
 case_dir = "/nobackup/sc16rsmy/bcsp-expert-cases/" 
 # case_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/"
 
-csv_path "/home/ufaserv1_k/sc16rsmy/bcsp-expert/test_cases_only.csv"
+csv_path = "/home/ufaserv1_k/sc16rsmy/bcsp-expert/test_cases_only.csv"
 # csv_path = "/Users/ysbecca/ysbecca-projects/fwat/test_cases.csv"
 
 
