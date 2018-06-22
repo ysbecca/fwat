@@ -9,28 +9,23 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # If 0, then will automatically look for annotations to view.
 DRAW = 0
 
-# XML or JSON. Assumes one or the other, both must be in slide coordinates.
-IS_XML = 1
-
 # Annotation saving directories
-ANNOTATION_DIR = "/home/ufaserv1_k/sc16rsmy/bcsp-expert/annotations/"
-# ANNOTATION_DIR = "/Users/ysbecca/ysbecca-projects/fwat/temp/"
-ANNOTATION_TYPES = ["EP", "SM"]
+ANNOTATION_DIR = ""
+# An array with short codes for annotation types - for example, if annotating tumour and stroma,
+# array could be ["T", "S"] or ["TU", "ST"]
+ANNOTATION_TYPES = [] 
 
-# Where to read existing annotations from - for displaying
-ANNOTATION_RDIR = "/nobackup/sc16rsmy/bcsp-expert-cases/annotations"
-# ANNOTATION_RDIR = "/Users/ysbecca/ysbecca-projects/fwat/temp/"
+# Where to read existing annotations from - for displaying. This can be set to ANNOTATION_DIR if 
+# it is the same.
+ANNOTATION_RDIR = ""
 
-DATASET = "BCSP Expert Training Set"
-STUDY = "EP/SM Annotation BCSP Expert"
+# Details for displaying basic study information on main page.
+DATASET = "Dataset name"
+STUDY = "Short description of study"
 
-# Case info (equivalent to fill_db.py)
-case_dir = "/nobackup/sc16rsmy/bcsp-expert-cases/" 
-# case_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI_xml/"
-
-csv_path "/home/ufaserv1_k/sc16rsmy/bcsp-expert/test_cases_only.csv"
-# csv_path = "/Users/ysbecca/ysbecca-projects/fwat/test_cases.csv"
-
+# Case info: optional; can be customised based on file structure.
+case_dir = ""
+csv_path = ""
 
 # Read case numbers from CSV file.
 IMAGE_PATHS = []
@@ -45,6 +40,7 @@ with open(csv_path, 'r') as csv_file:
 print("Found", len(cases), "cases.")
 
 for case in cases:
+		# Again, this can be customised based on your directory structure.
         this_case_dir = case_dir + "Case_" + case
         files = [file for file in listdir(this_case_dir) if isfile(join(this_case_dir, file))]
         for f in files:

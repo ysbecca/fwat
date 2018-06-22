@@ -14,11 +14,36 @@ def fetch_annotations(file_name):
 
 
 def fetch_coords(file_names):
-	all_coords = []
+	all_coords, errors = [], []
+	error = 0
+
 	for file in file_names:
-		with open(app.config["ANNOTATION_DIR"] + file) as f:
-			data = json.load(f)
-			all_coords.append(data)
+		if app.config["IS_XML"]:
+			try:
+				xml = minidom.parse(app.config["ANNOTATION_DIR"] + file)
+			except:
+				errors.append(file)
+				error = 1
+			if not error:
+				regions = xml.getElementsByTagName("Region")
+				coords = []
+
+				for region in regions:
+					# key = region.getElementsByTagName("Attribute")[0].attributes['Value'].value
+					vertices = region.getElementsByTagName("Vertex")
+					one_coord = np.zeros((len(vertices), 2))
+
+					for i, vertex in enumerate(vertices):
+						one_coord[i][0] = vertex.attributes['X'].value
+						one_coord[i][1] = vertex.attributes['Y'].value
+					coords.append(one_coord)
+				all_coords.append(coords)
+		else: # JSON
+			with open(app.config["ANNOTATION_DIR"] + file) as f:
+				data = json.load(f)
+				all_coords.append(data)
+
+	print("Annotation file errors: " + str(errors))
 	return all_coords
 
 
@@ -37,14 +62,6 @@ def convert_path_coords(paths, wsi_x, wsi_y):
 	        coords_array.append([round(x_factor*float(x), 2), round(y_factor*float(y), 2)])
 	    all_coords.append(coords_array)
 	return all_coords
-
-
-def xml_coords_to_svg(coords, wsi_x, wsi_y):
-	''' Converts a numpy array of a list of coordinates to svg coordinates for displaying on the viewBox. '''
-	# app.config["ANNOTATION_RDIR"]
-	x_factor, y_factor = wsi_x / 100.0, wsi_y / 100.0
-	# for c in coords:
-		
 
 
 def save_new_annotations_file(svg_path_string, wsi_x, wsi_y, code, file_name):
